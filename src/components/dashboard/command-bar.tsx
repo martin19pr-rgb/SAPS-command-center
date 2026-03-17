@@ -1,60 +1,99 @@
-
 "use client";
 
 import React, { useState } from "react";
-import { Mic, Search, Send, Terminal } from "lucide-react";
+import { Mic, Send, Terminal, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { naturalLanguageCommandInterface } from "@/ai/flows/natural-language-command-interface";
+import { cn } from "@/lib/utils";
+
+type FeedbackState = "idle" | "processing" | "success" | "error";
+
+const suggestions = [
+  "Show all critical incidents",
+  "Track Officer 247",
+  "Display risk zones",
+  "Escalate to EMS",
+];
 
 export default function CommandBar() {
   const [command, setCommand] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [feedback, setFeedback] = useState<FeedbackState>("idle");
+  const [lastResponse, setLastResponse] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!command.trim()) return;
-    
-    setIsProcessing(true);
+  const handleSubmit = async (text = command) => {
+    if (!text.trim()) return;
+    setFeedback("processing");
+    setLastResponse(null);
     try {
-      const result = await naturalLanguageCommandInterface({ commandText: command });
-      console.log("Command Result:", result);
-      // In a real app, this would trigger UI changes based on commandType
+      const result = await naturalLanguageCommandInterface({ commandText: text });
+      setLastResponse((result as any)?.response ?? "Command processed.");
+      setFeedback("success");
       setCommand("");
-    } catch (err) {
-      console.error(err);
+    } catch {
+      setFeedback("error");
     } finally {
-      setIsProcessing(false);
+      setTimeout(() => setFeedback("idle"), 4000);
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto mb-4 px-4">
-      <form 
-        onSubmit={handleSubmit}
-        className="relative flex items-center glass rounded-2xl p-1 shadow-2xl border-white/20 focus-within:border-primary/50 transition-all"
+    <div className="w-full px-2 pb-2 space-y-2">
+      {/* Suggestion chips */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {suggestions.map(s => (
+          <button
+            key={s}
+            onClick={() => { setCommand(s); handleSubmit(s); }}
+            className="text-[9px] font-bold whitespace-nowrap px-2.5 py-1 glass rounded-full border border-white/10 hover:border-primary/40 hover:text-primary transition-all text-muted-foreground"
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
+      <form
+        onSubmit={e => { e.preventDefault(); handleSubmit(); }}
+        className={cn(
+          "relative flex items-center glass rounded-2xl p-1 shadow-2xl border transition-all",
+          feedback === "success" ? "border-emerald-500/40" :
+          feedback === "error" ? "border-destructive/40" :
+          feedback === "processing" ? "border-primary/50 shadow-primary/10" :
+          "border-white/15 focus-within:border-primary/40"
+        )}
       >
         <div className="pl-4 pr-3 text-muted-foreground">
-          <Terminal size={18} />
+          <Terminal size={16}/>
         </div>
-        <input 
+        <input
           type="text"
           value={command}
-          onChange={(e) => setCommand(e.target.value)}
-          placeholder="Issue voice or text command (e.g., 'Locate Officer 247' or 'Show risk zones')..."
-          className="flex-1 bg-transparent border-none outline-none py-3 text-sm font-medium placeholder:text-muted-foreground/50"
+          onChange={e => setCommand(e.target.value)}
+          placeholder="Command (e.g. 'Locate Officer 247' · 'Show high-risk zones' · 'Dispatch nearest unit')…"
+          className="flex-1 bg-transparent border-none outline-none py-3 text-sm font-medium placeholder:text-muted-foreground/40"
+          disabled={feedback === "processing"}
         />
         <div className="flex items-center gap-2 pr-2">
-          <button 
-            type="button"
-            className="p-2 text-muted-foreground hover:text-white transition-colors"
-          >
-            <Mic size={18} />
+          {lastResponse && feedback === "success" && (
+            <span className="text-[9px] text-emerald-400 font-bold max-w-[120px] truncate flex items-center gap-1">
+              <CheckCircle2 size={10}/> {lastResponse}
+            </span>
+          )}
+          {feedback === "error" && (
+            <span className="text-[9px] text-destructive font-bold flex items-center gap-1">
+              <AlertCircle size={10}/> Failed
+            </span>
+          )}
+          <button type="button" className="p-2 text-muted-foreground hover:text-white transition-colors" title="Voice command">
+            <Mic size={16}/>
           </button>
-          <button 
+          <button
             type="submit"
-            disabled={isProcessing}
-            className="bg-primary text-white p-2.5 rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50"
+            disabled={feedback === "processing" || !command.trim()}
+            className="bg-primary text-white p-2 rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50"
           >
-            <Send size={18} className={isProcessing ? "animate-pulse" : ""} />
+            {feedback === "processing"
+              ? <Loader2 size={16} className="animate-spin"/>
+              : <Send size={16}/>
+            }
           </button>
         </div>
       </form>
