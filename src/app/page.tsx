@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -8,6 +7,7 @@ import OfficerTracking from "@/components/dashboard/officer-tracking";
 import CommandBar from "@/components/dashboard/command-bar";
 import DispatchHub from "@/components/dashboard/dispatch-hub";
 import { Shield, Settings, Bell, User, LayoutDashboard, Database, Activity } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   return (
