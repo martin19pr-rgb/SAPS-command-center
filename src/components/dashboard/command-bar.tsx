@@ -1,38 +1,165 @@
 "use client";
 
 import React, { useState } from "react";
-import { Mic, Send, Terminal, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import { naturalLanguageCommandInterface } from "@/ai/flows/natural-language-command-interface";
+import { Mic, Send, Terminal, CheckCircle2, AlertCircle, Loader2, TrafficCone, Camera, Crosshair, Radio } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { CommandType } from "@/lib/pursuit-store";
 
 type FeedbackState = "idle" | "processing" | "success" | "error";
 
+interface CommandResult {
+  type: CommandType;
+  response: string;
+  action?: string;
+}
+
 const suggestions = [
-  "Show all critical incidents",
-  "Track Officer 247",
-  "Display risk zones",
-  "Escalate to EMS",
+  { text: "Green corridor to Polokwane CBD", icon: TrafficCone, type: "TRAFFIC" as CommandType },
+  { text: "Show cameras near incident", icon: Camera, type: "CAMERA" as CommandType },
+  { text: "Activate pursuit mode", icon: Crosshair, type: "PURSUIT" as CommandType },
+  { text: "Escalate to EMS", icon: Radio, type: "DISPATCH" as CommandType },
+  { text: "Block Church St intersection", icon: TrafficCone, type: "TRAFFIC" as CommandType },
+  { text: "Track suspect north on N1", icon: Camera, type: "CAMERA" as CommandType },
 ];
 
-export default function CommandBar() {
+function parseSmartCommand(text: string): CommandResult {
+  const lower = text.toLowerCase();
+
+  if (lower.includes("pursuit") || lower.includes("chase") || lower.includes("suspect vehicle")) {
+    return {
+      type: "PURSUIT",
+      response: "Pursuit mode activated. AI tracking all cameras. Green corridor N1 northbound. Blocking east exits.",
+      action: "PURSUIT_MODE",
+    };
+  }
+
+  if (lower.includes("green corridor") || lower.includes("open route") || lower.includes("clear path")) {
+    const route = lower.includes("n1") ? "N1 Northbound" : lower.includes("r71") ? "R71 East" : "Police Route";
+    return {
+      type: "TRAFFIC",
+      response: `Green corridor activated on ${route}. 4 intersections set to priority green. Estimated clear time: 2 min.`,
+      action: "GREEN_CORRIDOR",
+    };
+  }
+
+  if (lower.includes("hold red") || lower.includes("held red") || lower.includes("stop traffic")) {
+    return {
+      type: "TRAFFIC",
+      response: "Intersections held red for 120 seconds. Church St, Schoeman St — all exits locked. Suspect routes blocked.",
+      action: "HOLD_RED",
+    };
+  }
+
+  if (lower.includes("block") && (lower.includes("intersection") || lower.includes("street") || lower.includes("road") || lower.includes("exit"))) {
+    return {
+      type: "TRAFFIC",
+      response: "Intersection blocked. Traffic diverted. Officers notified. Estimated duration: 8 minutes.",
+      action: "BLOCK",
+    };
+  }
+
+  if (lower.includes("camera") || lower.includes("cctv") || lower.includes("feed") || lower.includes("footage")) {
+    const loc = lower.includes("polokwane") ? "Polokwane CBD" : lower.includes("n1") ? "N1 Corridor" : "incident radius";
+    return {
+      type: "CAMERA",
+      response: `Fetching cameras near ${loc}. CAM-101, CAM-102, CAM-103 now live. AI scanning for suspects.`,
+      action: "SHOW_CAMERAS",
+    };
+  }
+
+  if (lower.includes("track") && (lower.includes("suspect") || lower.includes("north") || lower.includes("south"))) {
+    return {
+      type: "CAMERA",
+      response: "AI tracking activated on CAM-101 → CAM-102. Suspect: male, red jacket, northbound. Next camera: CAM-102 (N1 Overpass).",
+      action: "TRACK_SUSPECT",
+    };
+  }
+
+  if (lower.includes("dispatch") || lower.includes("nearest unit") || lower.includes("send unit")) {
+    return {
+      type: "DISPATCH",
+      response: "Dispatching LIM-247 — 1.4km from incident. ETA 3.1 min. Officer notified via radio.",
+      action: "DISPATCH",
+    };
+  }
+
+  if (lower.includes("escalate") || lower.includes("ems") || lower.includes("medical") || lower.includes("ambulance")) {
+    return {
+      type: "DISPATCH",
+      response: "EMS Limpopo notified. 7 units available. Code red dispatch to Polokwane CBD. ETA ~6 minutes.",
+      action: "ESCALATE_EMS",
+    };
+  }
+
+  if (lower.includes("risk zone") || lower.includes("high risk") || lower.includes("danger")) {
+    return {
+      type: "INFO",
+      response: "Displaying 3 active risk zones: Polokwane CBD (critical), Tzaneen (high), Thohoyandou (medium). Heat analysis updated.",
+    };
+  }
+
+  if (lower.includes("officer") || lower.includes("locate") || lower.includes("track officer")) {
+    const offId = (text.match(/\b(LIM-?\d+|\d{3})\b/i) || ["LIM-247"])[0];
+    return {
+      type: "INFO",
+      response: `Officer ${offId} located: -23.880° / 29.450°. Status: Enroute. BPM: 112. Battery: 84%. ETA to scene: 2.1 min.`,
+    };
+  }
+
+  if (lower.includes("restore") || lower.includes("reset traffic") || lower.includes("normal")) {
+    return {
+      type: "TRAFFIC",
+      response: "All traffic systems restored to normal. 7 intersections reverted. Corridor deactivated.",
+      action: "RESET_TRAFFIC",
+    };
+  }
+
+  return {
+    type: "GENERAL",
+    response: `Command processed: "${text}". SAPS AI brain is analysing and routing to the appropriate system.`,
+  };
+}
+
+const typeIcon: Record<CommandType, React.ReactNode> = {
+  TRAFFIC:  <TrafficCone size={10}/>,
+  CAMERA:   <Camera size={10}/>,
+  PURSUIT:  <Crosshair size={10}/>,
+  DISPATCH: <Radio size={10}/>,
+  INFO:     <Terminal size={10}/>,
+  GENERAL:  <Terminal size={10}/>,
+};
+const typeColor: Record<CommandType, string> = {
+  TRAFFIC:  "text-emerald-400",
+  CAMERA:   "text-blue-400",
+  PURSUIT:  "text-orange-400",
+  DISPATCH: "text-yellow-400",
+  INFO:     "text-muted-foreground",
+  GENERAL:  "text-muted-foreground",
+};
+
+interface Props {
+  onCommand?: (result: CommandResult) => void;
+}
+
+export default function CommandBar({ onCommand }: Props) {
   const [command, setCommand] = useState("");
   const [feedback, setFeedback] = useState<FeedbackState>("idle");
-  const [lastResponse, setLastResponse] = useState<string | null>(null);
+  const [lastResult, setLastResult] = useState<CommandResult | null>(null);
 
   const handleSubmit = async (text = command) => {
     if (!text.trim()) return;
     setFeedback("processing");
-    setLastResponse(null);
-    try {
-      const result = await naturalLanguageCommandInterface({ commandText: text });
-      setLastResponse((result as any)?.response ?? "Command processed.");
-      setFeedback("success");
-      setCommand("");
-    } catch {
-      setFeedback("error");
-    } finally {
-      setTimeout(() => setFeedback("idle"), 4000);
-    }
+    setLastResult(null);
+
+    await new Promise(r => setTimeout(r, 650));
+
+    const result = parseSmartCommand(text);
+    setLastResult(result);
+    setFeedback("success");
+    setCommand("");
+    onCommand?.(result);
+
+    setTimeout(() => setFeedback("idle"), 6000);
   };
 
   return (
@@ -41,11 +168,13 @@ export default function CommandBar() {
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
         {suggestions.map(s => (
           <button
-            key={s}
-            onClick={() => { setCommand(s); handleSubmit(s); }}
-            className="text-[9px] font-bold whitespace-nowrap px-2.5 py-1 glass rounded-full border border-white/10 hover:border-primary/40 hover:text-primary transition-all text-muted-foreground"
+            key={s.text}
+            onClick={() => handleSubmit(s.text)}
+            className={cn(
+              "text-[9px] font-bold whitespace-nowrap px-2.5 py-1 glass rounded-full border border-white/10 hover:border-primary/40 hover:text-primary transition-all text-muted-foreground flex items-center gap-1"
+            )}
           >
-            {s}
+            <s.icon size={9}/> {s.text}
           </button>
         ))}
       </div>
@@ -54,6 +183,9 @@ export default function CommandBar() {
         onSubmit={e => { e.preventDefault(); handleSubmit(); }}
         className={cn(
           "relative flex items-center glass rounded-2xl p-1 shadow-2xl border transition-all",
+          feedback === "success" && lastResult?.type === "PURSUIT" ? "border-orange-500/50 shadow-orange-500/10" :
+          feedback === "success" && lastResult?.type === "TRAFFIC" ? "border-emerald-500/40" :
+          feedback === "success" && lastResult?.type === "CAMERA"  ? "border-blue-500/40" :
           feedback === "success" ? "border-emerald-500/40" :
           feedback === "error" ? "border-destructive/40" :
           feedback === "processing" ? "border-primary/50 shadow-primary/10" :
@@ -67,14 +199,15 @@ export default function CommandBar() {
           type="text"
           value={command}
           onChange={e => setCommand(e.target.value)}
-          placeholder="Command (e.g. 'Locate Officer 247' · 'Show high-risk zones' · 'Dispatch nearest unit')…"
+          placeholder="'Green corridor to CBD' · 'Activate pursuit' · 'Block Church St' · 'Show cameras near incident'…"
           className="flex-1 bg-transparent border-none outline-none py-3 text-sm font-medium placeholder:text-muted-foreground/40"
           disabled={feedback === "processing"}
         />
         <div className="flex items-center gap-2 pr-2">
-          {lastResponse && feedback === "success" && (
-            <span className="text-[9px] text-emerald-400 font-bold max-w-[120px] truncate flex items-center gap-1">
-              <CheckCircle2 size={10}/> {lastResponse}
+          {lastResult && feedback === "success" && (
+            <span className={cn("text-[9px] font-bold max-w-[180px] truncate flex items-center gap-1", typeColor[lastResult.type])}>
+              {typeIcon[lastResult.type]}
+              {lastResult.response}
             </span>
           )}
           {feedback === "error" && (
@@ -88,7 +221,12 @@ export default function CommandBar() {
           <button
             type="submit"
             disabled={feedback === "processing" || !command.trim()}
-            className="bg-primary text-white p-2 rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50"
+            className={cn(
+              "text-white p-2 rounded-xl transition-all disabled:opacity-50",
+              lastResult?.type === "PURSUIT" ? "bg-orange-500 hover:bg-orange-400" :
+              lastResult?.type === "TRAFFIC" ? "bg-emerald-600 hover:bg-emerald-500" :
+              "bg-primary hover:bg-primary/90"
+            )}
           >
             {feedback === "processing"
               ? <Loader2 size={16} className="animate-spin"/>
@@ -97,6 +235,24 @@ export default function CommandBar() {
           </button>
         </div>
       </form>
+
+      {/* Full response strip */}
+      {lastResult && feedback === "success" && (
+        <div className={cn(
+          "glass rounded-xl border px-3 py-2 flex items-start gap-2 transition-all",
+          typeColor[lastResult.type],
+          lastResult.type === "PURSUIT" ? "border-orange-500/25 bg-orange-950/15" :
+          lastResult.type === "TRAFFIC" ? "border-emerald-500/20 bg-emerald-950/10" :
+          lastResult.type === "CAMERA"  ? "border-blue-500/20 bg-blue-950/10" :
+          "border-white/10"
+        )}>
+          <div className="flex-shrink-0 mt-0.5">{typeIcon[lastResult.type]}</div>
+          <div>
+            <span className="text-[8px] font-bold uppercase opacity-70">{lastResult.type} COMMAND</span>
+            <p className="text-[10px] font-medium text-white">{lastResult.response}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Wifi, Target, Radio, Navigation, Shield } from "lucide-react";
+import { Wifi, Target, Radio, Navigation, Shield, TrafficCone, Camera, Crosshair } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-type Tab = "standard" | "risk" | "patrol";
+import type { TrafficNode, CctvCamera, PursuitData, MapTab } from "@/lib/pursuit-store";
 
 const LIMPOPO_CENTER: [number, number] = [-23.9, 29.45];
 
@@ -39,16 +38,29 @@ const riskZones = [
 ];
 
 const sevColor: Record<string, string> = {
-  critical: "#ef4444",
-  high: "#f97316",
-  medium: "#f97316",
-  low: "#60a5fa",
+  critical: "#ef4444", high: "#f97316", medium: "#f97316", low: "#60a5fa",
 };
 
-export default function LimpopoMap() {
+const tlStateStyle: Record<string, { bg: string; glow: string; border: string }> = {
+  normal:         { bg: "#6b7280", glow: "transparent",   border: "rgba(255,255,255,0.3)" },
+  green_corridor: { bg: "#10b981", glow: "#10b981",        border: "rgba(16,185,129,0.8)" },
+  held_red:       { bg: "#ef4444", glow: "#ef4444",        border: "rgba(239,68,68,0.8)" },
+  blocked:        { bg: "#7f1d1d", glow: "transparent",   border: "rgba(127,29,29,0.7)" },
+};
+
+interface Props {
+  trafficNodes?: TrafficNode[];
+  cameras?: CctvCamera[];
+  pursuit?: PursuitData | null;
+  activeMapTab?: MapTab;
+  onTabChange?: (tab: MapTab) => void;
+}
+
+export default function LimpopoMap({ trafficNodes = [], cameras = [], pursuit = null, activeMapTab, onTabChange }: Props) {
   const mapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState<Tab>("standard");
+  const [internalTab, setInternalTab] = useState<MapTab>("standard");
+  const activeTab = activeMapTab ?? internalTab;
   const [syncTime, setSyncTime] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const layersRef = useRef<any[]>([]);
@@ -64,7 +76,6 @@ export default function LimpopoMap() {
 
     import("leaflet").then(L => {
       if (!containerRef.current) return;
-      // Clean up any stale Leaflet instance on the container (happens during Fast Refresh)
       const el = containerRef.current as any;
       if (el._leaflet_id) {
         try { mapRef.current?.remove(); } catch {}
@@ -87,10 +98,7 @@ export default function LimpopoMap() {
         attributionControl: false,
       });
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 18,
-      }).addTo(map);
-
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18 }).addTo(map);
       L.control.zoom({ position: "bottomright" }).addTo(map);
 
       mapRef.current = map;
@@ -115,14 +123,12 @@ export default function LimpopoMap() {
 
     const add = (layer: any) => { layer.addTo(mapRef.current); layersRef.current.push(layer); };
 
+    // Always show: incidents
     incidents.forEach(inc => {
       const color = sevColor[inc.severity];
-      const circle = L.circleMarker([inc.lat, inc.lng], {
+      add(L.circleMarker([inc.lat, inc.lng], {
         radius: inc.severity === "critical" ? 11 : 8,
-        color,
-        fillColor: color,
-        fillOpacity: 0.85,
-        weight: 2,
+        color, fillColor: color, fillOpacity: 0.85, weight: 2,
       }).bindPopup(`
         <div style="font-family:sans-serif;font-size:11px">
           <div style="font-weight:700;color:${color};text-transform:uppercase;margin-bottom:4px">🚨 ${inc.label}</div>
@@ -130,61 +136,147 @@ export default function LimpopoMap() {
           <div style="color:#9ca3af">Reported: ${inc.time}</div>
           <div style="color:${color};font-weight:700;text-transform:uppercase;margin-top:4px">${inc.severity} priority</div>
         </div>
-      `);
-      add(circle);
+      `));
     });
 
+    // Always show: officers
     officers.forEach(off => {
       const color = off.status === "Enroute" ? "#3b82f6" : off.status === "At Scene" ? "#f97316" : "#6366f1";
-      const marker = L.circleMarker([off.lat, off.lng], {
-        radius: 7,
-        color: "#fff",
-        fillColor: color,
-        fillOpacity: 1,
-        weight: 1.5,
+      add(L.circleMarker([off.lat, off.lng], {
+        radius: 7, color: "#fff", fillColor: color, fillOpacity: 1, weight: 1.5,
       }).bindPopup(`
         <div style="font-family:sans-serif;font-size:11px">
           <div style="font-weight:700;color:#fff;margin-bottom:4px">🚓 Officer ${off.id}</div>
           <div style="color:${color};font-weight:700">${off.status}</div>
         </div>
-      `);
-      add(marker);
+      `));
     });
 
+    // Always show: citizens
     citizens.forEach(cit => {
       const color = cit.status === "SOS Active" ? "#ef4444" : "#10b981";
-      const marker = L.circleMarker([cit.lat, cit.lng], {
-        radius: 6,
-        color: "#fff",
-        fillColor: color,
-        fillOpacity: 0.9,
-        weight: 1.5,
+      add(L.circleMarker([cit.lat, cit.lng], {
+        radius: 6, color: "#fff", fillColor: color, fillOpacity: 0.9, weight: 1.5,
       }).bindPopup(`
         <div style="font-family:sans-serif;font-size:11px">
           <div style="font-weight:700;color:#fff;margin-bottom:4px">🧍 Citizen ${cit.id}</div>
           <div style="color:${color};font-weight:700">${cit.status}</div>
         </div>
-      `);
-      add(marker);
+      `));
     });
 
+    // Risk zones tab
     if (activeTab === "risk") {
       riskZones.forEach(z => {
         const color = z.level === "critical" ? "#ef4444" : z.level === "high" ? "#f97316" : "#eab308";
-        const circle = L.circle([z.lat, z.lng], {
-          radius: z.radius,
-          color,
-          fillColor: color,
-          fillOpacity: 0.15,
-          weight: 1.5,
-          dashArray: "6 4",
-        }).bindPopup(`
-          <div style="font-family:sans-serif;font-size:11px;color:${color};font-weight:700;white-space:pre-line">${z.label}</div>
-        `);
-        add(circle);
+        add(L.circle([z.lat, z.lng], {
+          radius: z.radius, color, fillColor: color, fillOpacity: 0.15, weight: 1.5, dashArray: "6 4",
+        }).bindPopup(`<div style="font-family:sans-serif;font-size:11px;color:${color};font-weight:700;white-space:pre-line">${z.label}</div>`));
       });
     }
-  }, [mapReady, activeTab]);
+
+    // Traffic control tab
+    if (activeTab === "traffic" && trafficNodes.length > 0) {
+      trafficNodes.forEach(node => {
+        const s = tlStateStyle[node.state] ?? tlStateStyle.normal;
+        const icon = L.divIcon({
+          html: `<div style="width:14px;height:14px;border-radius:3px;background:${s.bg};border:2px solid ${s.border};box-shadow:0 0 8px ${s.glow};position:relative;">
+            <div style="position:absolute;top:-1px;left:-1px;right:-1px;bottom:-1px;border-radius:2px;background:${s.bg};opacity:0.4;animation:pulse 2s infinite;"></div>
+          </div>`,
+          iconSize: [14, 14],
+          className: "",
+        });
+        add(L.marker([node.lat, node.lng], { icon }).bindPopup(`
+          <div style="font-family:sans-serif;font-size:11px">
+            <div style="font-weight:700;color:${s.bg};text-transform:uppercase;margin-bottom:4px">🚦 ${node.id}</div>
+            <div style="color:#fff;font-weight:600">${node.name}</div>
+            <div style="color:#9ca3af">${node.district}</div>
+            <div style="margin-top:4px;text-transform:uppercase;font-weight:700;color:${s.bg}">STATE: ${node.state.replace("_", " ")}</div>
+          </div>
+        `));
+      });
+    }
+
+    // CCTV cameras tab
+    if (activeTab === "cameras" && cameras.length > 0) {
+      cameras.forEach(cam => {
+        const color = cam.tracking ? "#3b82f6" : "#4b5563";
+        const glow  = cam.tracking ? "#3b82f6" : "transparent";
+        const icon = L.divIcon({
+          html: `<div style="width:12px;height:10px;border-radius:2px;background:${color};border:1.5px solid rgba(255,255,255,0.5);box-shadow:0 0 8px ${glow};"></div>`,
+          iconSize: [12, 10],
+          className: "",
+        });
+        add(L.marker([cam.lat, cam.lng], { icon }).bindPopup(`
+          <div style="font-family:sans-serif;font-size:11px">
+            <div style="font-weight:700;color:${cam.tracking ? "#3b82f6" : "#fff"};text-transform:uppercase;margin-bottom:4px">📷 ${cam.id}</div>
+            <div style="color:#fff;font-weight:600">${cam.name}</div>
+            <div style="color:#9ca3af">${cam.type}</div>
+            ${cam.tracking ? `<div style="margin-top:4px;color:#3b82f6;font-weight:700">● AI TRACKING ACTIVE</div>` : ""}
+          </div>
+        `));
+      });
+    }
+
+    // Pursuit mode tab
+    if (activeTab === "pursuit" && pursuit) {
+      // Suspect route: dashed red line from incident to interception
+      const incidentPos = incidents[0];
+      const interceptPos = [pursuit.interceptionLat, pursuit.interceptionLng];
+
+      // Suspect path (dashed red)
+      add(L.polyline([[incidentPos.lat, incidentPos.lng], interceptPos], {
+        color: "#ef4444", weight: 3, dashArray: "8 6", opacity: 0.85,
+      }));
+
+      // Police corridor (green)
+      add(L.polyline([[-23.880, 29.450], interceptPos], {
+        color: "#10b981", weight: 4, dashArray: "12 4", opacity: 0.85,
+      }));
+
+      // Interception zone
+      add(L.circle(interceptPos, {
+        radius: 2000, color: "#eab308", fillColor: "#eab308", fillOpacity: 0.15, weight: 2, dashArray: "6 4",
+      }).bindPopup(`
+        <div style="font-family:sans-serif;font-size:11px;color:#eab308;font-weight:700">
+          🎯 AI INTERCEPTION ZONE<br/>${pursuit.interceptionPoint}
+        </div>
+      `));
+
+      // Suspect marker
+      const suspectIcon = L.divIcon({
+        html: `<div style="width:18px;height:18px;border-radius:50%;background:#ef4444;border:2px solid #fff;box-shadow:0 0 12px #ef4444;display:flex;align-items:center;justify-content:center;font-size:9px;">🚗</div>`,
+        iconSize: [18, 18], className: "",
+      });
+      add(L.marker([incidentPos.lat + 0.02, incidentPos.lng + 0.01], { icon: suspectIcon })
+        .bindPopup(`<div style="font-family:sans-serif;font-size:11px;color:#ef4444;font-weight:700">🚗 SUSPECT: ${pursuit.suspectVehicle}</div>`));
+
+      // Camera markers along route
+      cameras.filter(c => c.tracking).forEach(cam => {
+        const camIcon = L.divIcon({
+          html: `<div style="width:14px;height:11px;border-radius:2px;background:#3b82f6;border:2px solid #fff;box-shadow:0 0 10px #3b82f6;"></div>`,
+          iconSize: [14, 11], className: "",
+        });
+        add(L.marker([cam.lat, cam.lng], { icon: camIcon })
+          .bindPopup(`<div style="font-family:sans-serif;font-size:11px;color:#3b82f6;font-weight:700">📷 ${cam.id} — AI TRACKING</div>`));
+      });
+    }
+
+  }, [mapReady, activeTab, trafficNodes, cameras, pursuit]);
+
+  const handleTabChange = (tab: MapTab) => {
+    setInternalTab(tab);
+    onTabChange?.(tab);
+  };
+
+  const tabButtons: [MapTab, any, string][] = [
+    ["standard", Target, "Standard"],
+    ["risk",     Radio,       "Risk Zones"],
+    ["patrol",   Navigation,  "Patrols"],
+    ["traffic",  TrafficCone, "Traffic Ctrl"],
+    ["cameras",  Camera,      "City Cameras"],
+    ["pursuit",  Crosshair,   "Pursuit Mode"],
+  ];
 
   return (
     <div className="relative w-full h-full glass rounded-xl overflow-hidden border-white/5 shadow-2xl">
@@ -192,22 +284,28 @@ export default function LimpopoMap() {
 
       {/* HUD corners */}
       <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-primary/60 pointer-events-none z-10"/>
-      <div className="absolute top-3 right-16 w-5 h-5 border-t-2 border-r-2 border-primary/60 pointer-events-none z-10"/>
+      <div className="absolute top-3 right-20 w-5 h-5 border-t-2 border-r-2 border-primary/60 pointer-events-none z-10"/>
       <div className="absolute bottom-16 left-3 w-5 h-5 border-b-2 border-l-2 border-primary/60 pointer-events-none z-10"/>
 
       {/* View controls */}
-      <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
-        {([["standard", Target, "Standard"], ["risk", Radio, "Risk Zones"], ["patrol", Navigation, "Patrols"]] as const).map(([id, Icon, label]) => (
+      <div className="absolute top-4 right-4 flex flex-col gap-1.5 z-20">
+        {tabButtons.map(([id, Icon, label]) => (
           <button
             key={id}
-            onClick={() => setActiveTab(id as Tab)}
+            onClick={() => handleTabChange(id)}
             title={label}
             className={cn(
-              "p-2 rounded-lg glass transition-all hover:bg-white/10",
-              activeTab === id && "bg-primary text-white border-primary shadow-lg shadow-primary/40"
+              "p-2 rounded-lg glass transition-all hover:bg-white/10 border",
+              activeTab === id
+                ? id === "pursuit"
+                  ? "bg-orange-500 text-white border-orange-400 shadow-lg shadow-orange-500/40"
+                  : id === "traffic"
+                  ? "bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/30"
+                  : "bg-primary text-white border-primary shadow-lg shadow-primary/40"
+                : "border-white/10"
             )}
           >
-            <Icon size={15}/>
+            <Icon size={14}/>
           </button>
         ))}
       </div>
@@ -217,12 +315,43 @@ export default function LimpopoMap() {
         <div className="flex items-center gap-2 text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
           <Shield size={10} className="text-primary"/> LIMPOPO
         </div>
-        {[["bg-destructive", "Critical"], ["bg-orange-500", "Medium/High"], ["bg-blue-400", "Low"], ["bg-primary", "Officer"], ["bg-emerald-400", "EMS/Citizen"]].map(([cls, label]) => (
-          <div key={label} className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${cls}`}/>
-            <span className="text-[8px] text-muted-foreground">{label}</span>
-          </div>
-        ))}
+        {activeTab === "traffic" ? (
+          <>
+            {[["bg-emerald-400", "Green Corridor"], ["bg-destructive", "Held Red"], ["bg-red-950", "Blocked"], ["bg-gray-500", "Normal"]].map(([cls, label]) => (
+              <div key={label} className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-sm ${cls}`}/>
+                <span className="text-[8px] text-muted-foreground">{label}</span>
+              </div>
+            ))}
+          </>
+        ) : activeTab === "cameras" ? (
+          <>
+            {[["bg-primary", "AI Tracking"], ["bg-gray-500", "Camera"]].map(([cls, label]) => (
+              <div key={label} className="flex items-center gap-2">
+                <div className={`w-2 h-1.5 rounded-sm ${cls}`}/>
+                <span className="text-[8px] text-muted-foreground">{label}</span>
+              </div>
+            ))}
+          </>
+        ) : activeTab === "pursuit" ? (
+          <>
+            {[["bg-destructive", "Suspect Route"], ["bg-emerald-400", "Police Route"], ["bg-yellow-400", "Interception"], ["bg-primary", "CCTV Tracking"]].map(([cls, label]) => (
+              <div key={label} className="flex items-center gap-2">
+                <div className={`w-3 h-0.5 ${cls}`}/>
+                <span className="text-[8px] text-muted-foreground">{label}</span>
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            {[["bg-destructive", "Critical"], ["bg-orange-500", "Medium/High"], ["bg-blue-400", "Low"], ["bg-primary", "Officer"], ["bg-emerald-400", "EMS/Citizen"]].map(([cls, label]) => (
+              <div key={label} className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${cls}`}/>
+                <span className="text-[8px] text-muted-foreground">{label}</span>
+              </div>
+            ))}
+          </>
+        )}
       </div>
 
       {/* Status bar */}
@@ -240,6 +369,12 @@ export default function LimpopoMap() {
             <div className="w-2 h-2 rounded-full bg-primary"/>
             <span className="font-bold tracking-tight text-[10px]">{officers.length} UNITS</span>
           </div>
+          {pursuit && (
+            <div className="flex items-center gap-1.5 text-orange-400 animate-pulse">
+              <Crosshair size={10}/>
+              <span className="font-bold tracking-tight text-[10px]">PURSUIT ACTIVE</span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-1.5 text-muted-foreground font-mono text-[10px] tracking-widest">
           <Wifi size={11} className="text-emerald-400 animate-pulse"/>
