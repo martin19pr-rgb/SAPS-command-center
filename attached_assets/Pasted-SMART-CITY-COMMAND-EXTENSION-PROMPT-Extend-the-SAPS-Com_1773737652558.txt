@@ -1,0 +1,223 @@
+SMART CITY COMMAND EXTENSION – PROMPT
+
+Extend the SAPS Command Platform for the
+South African Police Service
+to integrate with smart city infrastructure across Limpopo.
+
+The system must allow police officers and command centres to:
+
+Control traffic systems during active incidents
+
+Access and analyse city surveillance cameras
+
+Track suspects across urban environments
+
+Coordinate pursuit operations in real time
+
+🚦 1. SMART TRAFFIC LIGHT CONTROL SYSTEM
+🧠 PURPOSE
+
+During a chase or emergency:
+
+“Clear the path for police, restrict escape routes for suspects.”
+
+⚡ OFFICER COMMANDS (Natural Language)
+
+Police officers or dispatch can issue commands like:
+
+"Hold red on all intersections ahead for 2 minutes"
+"Turn Route N1 northbound green for police vehicle"
+"Block intersection at Church Street and Nelson Mandela Drive"
+"Create green corridor towards Polokwane CBD"
+⚙️ SYSTEM BEHAVIOUR
+
+When command is issued:
+
+Identify officer location
+
+Predict movement path
+
+Communicate with traffic light system
+
+Override signals temporarily
+
+Revert to normal after timeout
+
+💻 SAMPLE COMMAND HANDLER
+async function controlTraffic(command: string) {
+  const parsed = parseCommand(command);
+
+  if (parsed.type === "HOLD_RED") {
+    await fetch("/api/traffic/control", {
+      method: "POST",
+      body: JSON.stringify({
+        intersections: parsed.targets,
+        state: "RED",
+        duration: 120 // seconds
+      })
+    });
+  }
+
+  if (parsed.type === "GREEN_CORRIDOR") {
+    await fetch("/api/traffic/green-corridor", {
+      method: "POST",
+      body: JSON.stringify({
+        route: parsed.route
+      })
+    });
+  }
+}
+🚀 VISUAL ON SMART MAP
+
+Traffic lights change colour live
+
+Route highlights for police
+
+Blocked intersections glow red
+
+🎥 2. URBAN CAMERA (CCTV) INTEGRATION
+🧠 PURPOSE
+
+Turn city cameras into:
+
+“A live tracking network for suspects and incidents.”
+
+📡 CAPABILITIES
+
+Access nearby cameras automatically
+
+Stream live footage into dashboard
+
+AI detect suspects / vehicles
+
+Track movement across camera network
+
+⚡ COMMANDS
+"Show cameras near last incident"
+"Track suspect moving north from Polokwane CBD"
+"Display all cameras within 2km radius"
+"Switch to traffic camera feed on R71"
+💻 CAMERA FETCH LOGIC
+async function fetchNearbyCameras(lat: number, lng: number) {
+  const res = await fetch(`/api/cameras?lat=${lat}&lng=${lng}`);
+  return res.json();
+}
+🎯 CAMERA OBJECT STRUCTURE
+{
+  "id": "cam_102",
+  "location": { "lat": -23.9, "lng": 29.45 },
+  "type": "traffic",
+  "streamUrl": "https://citycams/stream/102",
+  "status": "active"
+}
+🧠 AI VIDEO TRACKING
+
+AI must:
+
+Detect suspect clothing / features
+
+Track movement across cameras
+
+Identify vehicles (plates if possible)
+
+🔁 TRACKING FLOW
+Incident → Camera detected → AI identifies suspect
+→ Next camera predicted → Auto-switch feed
+→ Live tracking continues
+🚓 3. PURSUIT MODE (GAME-CHANGER)
+
+When activated:
+
+“The entire city assists the officer.”
+
+🔥 AUTOMATED ACTIONS
+
+Traffic lights adjust dynamically
+
+Cameras auto-follow suspect
+
+Route optimisation updates live
+
+Backup units auto-alerted
+
+⚡ COMMAND
+"Activate pursuit mode for suspect vehicle"
+💻 SAMPLE TRIGGER
+async function activatePursuitMode(incidentId: string) {
+  await fetch("/api/pursuit/start", {
+    method: "POST",
+    body: JSON.stringify({ incidentId })
+  });
+}
+🧠 4. AI DECISION LAYER (WHAT MAKES IT ELITE)
+
+This is where your system beats everything else.
+
+🔮 AI SHOULD AUTOMATICALLY:
+🚦 Traffic
+
+Predict suspect route
+
+Block escape paths
+
+Open police routes
+
+🎥 Cameras
+
+Auto-select relevant feeds
+
+Highlight suspect
+
+Switch cameras seamlessly
+
+🚓 Dispatch
+
+Suggest backup units
+
+Calculate interception points
+
+📊 EXAMPLE OUTPUT
+{
+  "suspectDirection": "North",
+  "nextCamera": "cam_145",
+  "recommendedUnits": ["Officer_212", "Officer_305"],
+  "interceptionPoint": "R71 Junction",
+  "trafficAction": "Block East Exit"
+}
+🎨 5. SMART MAP VISUAL UPGRADE
+
+Add:
+
+🚦 Traffic nodes (live state)
+
+📷 Camera icons (click to view feed)
+
+🔴 Blocked routes
+
+🟢 Police corridors
+
+🧠 AI suggested interception zones
+
+🔐 6. SECURITY (VERY IMPORTANT)
+
+Only allow:
+
+Command-level users → traffic control
+
+Dispatch → camera access
+
+Officers → limited commands
+
+All actions must be:
+
+Logged
+
+Time-limited
+
+Audited
+
+🚀 FINAL VISION
+
+Your SAPS system becomes:
+
+A fully integrated smart-city policing platform where roads, cameras, and officers operate as one intelligent network.

@@ -1,0 +1,170 @@
+CODE (React + Leaflet + Firebase)
+
+Here’s a clean working base for your Smart Map component.
+
+📦 Install dependencies
+npm install leaflet react-leaflet firebase
+🗺️ SmartMap.tsx
+"use client";
+
+import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
+
+type Incident = {
+  id: string;
+  lat: number;
+  lng: number;
+  threatLevel: string;
+};
+
+type Officer = {
+  id: string;
+  lat: number;
+  lng: number;
+  status: string;
+};
+
+type Citizen = {
+  id: string;
+  lat: number;
+  lng: number;
+  status: string;
+};
+
+export default function SmartMap() {
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [officers, setOfficers] = useState<Officer[]>([]);
+  const [citizens, setCitizens] = useState<Citizen[]>([]);
+
+  // 🔴 INCIDENTS
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "incidents"), (snap) => {
+      setIncidents(
+        snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Incident[]
+      );
+    });
+    return () => unsub();
+  }, []);
+
+  // 🟢 OFFICERS
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "officers"), (snap) => {
+      setOfficers(
+        snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Officer[]
+      );
+    });
+    return () => unsub();
+  }, []);
+
+  // 🔵 CITIZENS
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "citizens"), (snap) => {
+      setCitizens(
+        snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Citizen[]
+      );
+    });
+    return () => unsub();
+  }, []);
+
+  return (
+    <MapContainer
+      center={[-23.9, 29.45]} // Limpopo
+      zoom={7}
+      className="h-full w-full rounded-xl"
+    >
+      {/* 🌍 Base Map */}
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+
+      {/* 🔴 INCIDENTS */}
+      {incidents.map((inc) => (
+        <Circle
+          key={inc.id}
+          center={[inc.lat, inc.lng]}
+          radius={200}
+          pathOptions={{ color: "red" }}
+        >
+          <Popup>
+            🚨 Incident <br />
+            Threat: {inc.threatLevel}
+          </Popup>
+        </Circle>
+      ))}
+
+      {/* 🟢 OFFICERS */}
+      {officers.map((off) => (
+        <Marker key={off.id} position={[off.lat, off.lng]}>
+          <Popup>
+            🚓 Officer {off.id} <br />
+            Status: {off.status}
+          </Popup>
+        </Marker>
+      ))}
+
+      {/* 🔵 CITIZENS */}
+      {citizens.map((cit) => (
+        <Marker key={cit.id} position={[cit.lat, cit.lng]}>
+          <Popup>
+            🧍 Citizen {cit.id} <br />
+            Status: {cit.status}
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  );
+}
+🧠 NEXT-LEVEL UPGRADES (YOU SHOULD ADD)
+🔥 1. Marker Clustering
+npm install react-leaflet-cluster
+🔥 2. Heatmap Layer
+npm install leaflet.heat
+🔥 3. Animated Pulsing Markers
+
+Use Framer Motion overlays
+
+🔥 4. AI Risk Overlay
+
+Add Firestore collection:
+
+riskZones
+- lat
+- lng
+- intensity
+
+Render as heatmap.
+
+🚀 FINAL VISION
+
+When this is done, your map should feel like:
+
+GTA-style live world
+
+Military command system
+
+Real-time intelligence engine
+
+🧠 Real Talk (For YOU)
+
+This Smart Map alone:
+
+👉 Can be your main selling point to government
+👉 Can power your entire SAPS pitch
+👉 Can evolve into a national system
+
+If you want next:
+
+I can help you:
+
+✅ Connect this map to your citizen SOS flow
+✅ Add AI threat detection pipeline
+✅ Build auto-dispatch logic (very important)
+
+Just say:
+
+“Next: Auto-dispatch system”
+
+and we go deeper.
