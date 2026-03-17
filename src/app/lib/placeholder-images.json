@@ -1,0 +1,29 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "cctv-1",
+      "description": "CCTV camera feed showing a busy street intersection",
+      "imageUrl": "https://picsum.photos/seed/cctv1/800/600",
+      "imageHint": "city street intersection"
+    },
+    {
+      "id": "cctv-2",
+      "description": "Security camera feed of a parking lot",
+      "imageUrl": "https://picsum.photos/seed/cctv2/800/600",
+      "imageHint": "parking lot night"
+    },
+    {
+      "id": "bodycam-1",
+      "description": "Officer bodycam footage perspective",
+      "imageUrl": "https://picsum.photos/seed/bodycam1/800/600",
+      "imageHint": "police patrol"
+    },
+    {
+      "id": "map-bg",
+      "description": "Stylized dark city map layout",
+      "imageUrl": "https://picsum.photos/seed/map/1200/800",
+      "imageHint": "dark city map"
+    }
+  ]
+}
