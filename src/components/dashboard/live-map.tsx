@@ -19,6 +19,11 @@ const officers = [
 
 export default function LiveOperationalMap() {
   const [activeTab, setActiveTab] = useState<"standard" | "risk" | "patrol">("standard");
+  const [syncTime, setSyncTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSyncTime(new Date().toLocaleTimeString());
+  }, []);
 
   return (
     <div className="relative w-full h-full glass rounded-xl overflow-hidden group">
@@ -116,9 +121,10 @@ export default function LiveOperationalMap() {
           <Radio size={18} />
         </button>
         <button 
-          onClick={() => setActiveTab("patrol")}
+          onClick={() => setActiveTab("risk")}
           className={cn("p-2 rounded-lg glass transition-all hover:bg-white/10", activeTab === "patrol" && "bg-primary/20 border-primary/50")}
           title="Optimal Patrols"
+          onClick={() => setActiveTab("patrol")}
         >
           <Navigation size={18} />
         </button>
@@ -137,7 +143,7 @@ export default function LiveOperationalMap() {
           </div>
         </div>
         <div className="text-muted-foreground">
-          LAST SYNC: {new Date().toLocaleTimeString()}
+          LAST SYNC: {syncTime || "--:--:--"}
         </div>
       </div>
     </div>

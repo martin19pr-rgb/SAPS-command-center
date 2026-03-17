@@ -1,6 +1,7 @@
+
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import LiveOperationalMap from "@/components/dashboard/live-map";
 import VideoIntelligence from "@/components/dashboard/video-intelligence";
 import OfficerTracking from "@/components/dashboard/officer-tracking";
@@ -10,6 +11,20 @@ import { Shield, Settings, Bell, User, LayoutDashboard, Database, Activity } fro
 import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
+  const [systemTime, setSystemTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Set initial time on mount to avoid hydration mismatch
+    setSystemTime(new Date().toLocaleTimeString());
+    
+    // Update time every second
+    const timer = setInterval(() => {
+      setSystemTime(new Date().toLocaleTimeString());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden text-foreground">
       {/* Mini Sidebar Nav */}
@@ -49,7 +64,9 @@ export default function DashboardPage() {
           <div className="flex items-center gap-6">
             <div className="flex flex-col items-end">
               <span className="text-[10px] text-muted-foreground uppercase">System Time</span>
-              <span className="text-sm font-mono font-bold tracking-wider">{new Date().toLocaleTimeString()}</span>
+              <span className="text-sm font-mono font-bold tracking-wider">
+                {systemTime || "--:--:--"}
+              </span>
             </div>
             <div className="flex flex-col items-end">
               <span className="text-[10px] text-muted-foreground uppercase">Jurisdiction</span>
@@ -67,6 +84,7 @@ export default function DashboardPage() {
                 <OfficerTracking />
               </div>
               <div className="h-72">
+                 DispatchHub is a Client Component 
                 <DispatchHub />
               </div>
             </div>
