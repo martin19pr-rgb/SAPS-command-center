@@ -15,8 +15,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'SAPS Limpopo Command | AI-Powered Operational Brain',
-  description: 'Next-generation command and control for Limpopo Provincial Police Service.',
+  title: 'LMPS Lesotho Command | AI-Powered Operational Brain',
+  description: 'Next-generation command and control for Lesotho Mounted Police Service.',
 };
 
 export default function RootLayout({

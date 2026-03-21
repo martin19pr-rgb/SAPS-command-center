@@ -12,13 +12,13 @@ import SoundToggle, { SoundSettings } from "@/components/dashboard/sound-toggle"
 import type { ReactNode } from "react";
 
 const criticalAlerts = [
-  { id: 1, msg: "SHOOTING — Tzaneen · 2 suspects fleeing on foot", time: "18:49" },
-  { id: 2, msg: "ARMED ROBBERY — Polokwane CBD · Armed suspects", time: "18:46" },
-  { id: 3, msg: "KIDNAPPING — Louis Trichardt · AMBER alert issued", time: "18:44" },
+  { id: 1, msg: "SHOOTING — Leribe · 2 suspects fleeing on foot", time: "18:49" },
+  { id: 2, msg: "ARMED ROBBERY — Maseru CBD · Armed suspects", time: "18:46" },
+  { id: 3, msg: "KIDNAPPING — Thaba-Tseka · AMBER alert issued", time: "18:44" },
 ];
 
 const navItems = [
-  { href: "/", icon: LayoutDashboard, label: "Provincial Command" },
+  { href: "/", icon: LayoutDashboard, label: "National Command" },
   { href: "/activity", icon: Activity, label: "Operational Activity" },
   { href: "/alerts", icon: Bell, label: "Alerts", badge: true },
 ];
@@ -29,7 +29,7 @@ interface Props {
   pageSubtitle?: string;
 }
 
-export default function DashboardShell({ children, pageTitle = "SAPS LIMPOPO COMMAND", pageSubtitle = "LIMPOPO PROVINCE" }: Props) {
+export default function DashboardShell({ children, pageTitle = "LMPS LESOTHO COMMAND", pageSubtitle = "KINGDOM OF LESOTHO" }: Props) {
   const pathname = usePathname();
   const [systemTime, setSystemTime] = useState<string | null>(null);
   const [alertIndex, setAlertIndex] = useState(0);
@@ -54,9 +54,9 @@ export default function DashboardShell({ children, pageTitle = "SAPS LIMPOPO COM
     <div className="flex h-screen w-full bg-background overflow-hidden text-foreground font-body">
       {/* Sidebar */}
       <aside className="w-16 h-full flex flex-col items-center py-5 border-r border-white/10 glass gap-6 z-50 flex-shrink-0">
-        {/* SAPS Emblem */}
+        {/* LMPS Emblem */}
         <div className="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-primary/40 shadow-lg shadow-primary/30 flex-shrink-0">
-          <img src="/saps-emblem.jpg" alt="SAPS" className="w-full h-full object-cover"/>
+          <img src="/lmps-emblem.webp" alt="LMPS" className="w-full h-full object-cover"/>
         </div>
 
         <nav className="flex flex-col gap-5 text-muted-foreground flex-1">
@@ -99,7 +99,7 @@ export default function DashboardShell({ children, pageTitle = "SAPS LIMPOPO COM
         {/* Header */}
         <header className="h-14 px-6 flex items-center justify-between border-b border-white/8 glass flex-shrink-0">
           <div className="flex items-center gap-3">
-            <img src="/saps-emblem.jpg" alt="SAPS" className="w-8 h-8 rounded-lg object-cover ring-1 ring-primary/30 flex-shrink-0"/>
+            <img src="/lmps-emblem.webp" alt="LMPS" className="w-8 h-8 rounded-lg object-cover ring-1 ring-primary/30 flex-shrink-0"/>
             <div>
               <h1 className="text-base font-headline font-bold tracking-tight leading-tight">{pageTitle}</h1>
               <p className="text-[9px] text-muted-foreground uppercase tracking-widest leading-tight">{pageSubtitle}</p>
@@ -118,8 +118,8 @@ export default function DashboardShell({ children, pageTitle = "SAPS LIMPOPO COM
               <span className="text-sm font-mono font-bold tracking-wider tabular-nums">{systemTime || "--:--:--"}</span>
             </div>
             <div className="flex flex-col items-end">
-              <span className="text-[9px] text-muted-foreground uppercase tracking-wider">Province</span>
-              <span className="text-sm font-bold">LIMPOPO</span>
+              <span className="text-[9px] text-muted-foreground uppercase tracking-wider">Country</span>
+              <span className="text-sm font-bold">LESOTHO</span>
             </div>
           </div>
         </header>

@@ -20,22 +20,22 @@ import {
   type MapTab,
 } from "@/lib/pursuit-store";
 
-const LimpopoMap = dynamic(() => import("@/components/dashboard/limpopo-map"), { ssr: false });
+const LesothoMap = dynamic(() => import("@/components/dashboard/limpopo-map"), { ssr: false });
 
 const DEFAULT_PURSUIT: PursuitData = {
   active: true,
   incidentId: "INC-4411",
   suspectId: "SUSPECT-ALPHA",
-  suspectVehicle: "Silver Sedan · PLK-4**",
+  suspectVehicle: "Silver Sedan · MSR-4**",
   suspectDirection: "NORTHBOUND",
   suspectSpeed: "~120 km/h",
   nextCamera: "CAM-102",
   currentCamera: "CAM-101",
-  recommendedUnits: ["LIM-247", "LIM-334"],
-  interceptionPoint: "N1 / Mankweng Junction",
-  interceptionLat: -23.850,
-  interceptionLng: 29.460,
-  trafficAction: "N1 Corridor GREEN",
+  recommendedUnits: ["LMP-247", "LMP-334"],
+  interceptionPoint: "A1 / Leabua Jonathan Bridge Junction",
+  interceptionLat: -29.270,
+  interceptionLng: 27.480,
+  trafficAction: "A1 Corridor GREEN",
   elapsedSeconds: 0,
 };
 
@@ -100,7 +100,7 @@ export default function DashboardPage() {
   }, [handleActivatePursuit, handleGreenCorridor, handleResetTraffic]);
 
   return (
-    <DashboardShell pageTitle="SAPS LIMPOPO COMMAND" pageSubtitle="Provincial Operational Brain — Limpopo">
+    <DashboardShell pageTitle="LMPS LESOTHO COMMAND" pageSubtitle="National Operational Brain — Kingdom of Lesotho">
       <div className="flex-1 p-5 flex flex-col gap-4 overflow-hidden">
         <PerformanceMetrics/>
 
@@ -120,10 +120,10 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Center: Real Limpopo Map + Command */}
+          {/* Center: Lesotho Map + Command */}
           <div className="flex-1 flex flex-col gap-4 min-w-0">
             <div className="flex-1 min-h-0">
-              <LimpopoMap
+              <LesothoMap
                 trafficNodes={trafficNodes}
                 cameras={cameras}
                 pursuit={pursuit}

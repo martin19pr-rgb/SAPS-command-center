@@ -21,7 +21,7 @@ interface Feed {
 
 const feeds: Feed[] = [
   {
-    id: 1, name: "Johannesburg CBD — CAM-08", type: "CCTV", threat: "SUSPICIOUS", confidence: 74,
+    id: 1, name: "Maseru CBD — CAM-08", type: "CCTV", threat: "SUSPICIOUS", confidence: 74,
     status: "Warning", detections: ["Loitering group", "Unlit area"], imgSeed: "cctv8",
   },
   {
@@ -29,7 +29,7 @@ const feeds: Feed[] = [
     status: "Critical", detections: ["Firearm", "Hostile posture"], imgSeed: "bodycam247",
   },
   {
-    id: 3, name: "Sandton Junction — CAM-12", type: "CCTV", threat: "CLEAR", confidence: 98,
+    id: 3, name: "Leabua Jonathan Bridge — CAM-12", type: "CCTV", threat: "CLEAR", confidence: 98,
     status: "Normal", detections: [], imgSeed: "sandton12",
   },
   {

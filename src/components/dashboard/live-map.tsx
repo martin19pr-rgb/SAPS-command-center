@@ -5,11 +5,11 @@ import { ShieldAlert, Navigation, Radio, Target, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const incidents = [
-  { id: 1, x: 45, y: 30, severity: "critical", label: "ARMED ROBBERY", district: "Johannesburg CBD", time: "18:42" },
-  { id: 2, x: 62, y: 55, severity: "medium", label: "HIJACKING", district: "Sandton", time: "18:39" },
-  { id: 3, x: 25, y: 68, severity: "low", label: "CIVIL UNREST", district: "Soweto", time: "18:31" },
-  { id: 4, x: 78, y: 22, severity: "medium", label: "ASSAULT", district: "Pretoria East", time: "18:44" },
-  { id: 5, x: 14, y: 42, severity: "critical", label: "SHOOTING", district: "Alexandra", time: "18:46" },
+  { id: 1, x: 45, y: 30, severity: "critical", label: "ARMED ROBBERY", district: "Maseru CBD", time: "18:42" },
+  { id: 2, x: 62, y: 55, severity: "medium", label: "HIJACKING", district: "Leribe", time: "18:39" },
+  { id: 3, x: 25, y: 68, severity: "low", label: "CIVIL UNREST", district: "Mohale's Hoek", time: "18:31" },
+  { id: 4, x: 78, y: 22, severity: "medium", label: "ASSAULT", district: "Butha-Buthe", time: "18:44" },
+  { id: 5, x: 14, y: 42, severity: "critical", label: "SHOOTING", district: "Thaba-Tseka", time: "18:46" },
 ];
 
 const officers = [

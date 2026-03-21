@@ -5,36 +5,36 @@ import { Wifi, Target, Radio, Navigation, Shield, TrafficCone, Camera, Crosshair
 import { cn } from "@/lib/utils";
 import type { TrafficNode, CctvCamera, PursuitData, MapTab } from "@/lib/pursuit-store";
 
-const LIMPOPO_CENTER: [number, number] = [-23.9, 29.45];
+const LESOTHO_CENTER: [number, number] = [-29.55, 28.23];
 
 const incidents = [
-  { id: 1, lat: -23.9045, lng: 29.4679, severity: "critical", label: "ARMED ROBBERY", district: "Polokwane CBD", time: "18:46" },
-  { id: 2, lat: -23.8333, lng: 30.1667, severity: "critical", label: "SHOOTING", district: "Tzaneen", time: "18:44" },
-  { id: 3, lat: -22.9500, lng: 30.4833, severity: "medium",   label: "HIJACKING", district: "Thohoyandou", time: "18:39" },
-  { id: 4, lat: -23.3167, lng: 30.7167, severity: "low",      label: "CIVIL UNREST", district: "Giyani", time: "18:31" },
-  { id: 5, lat: -24.1833, lng: 28.9667, severity: "medium",   label: "ASSAULT", district: "Mokopane", time: "18:38" },
-  { id: 6, lat: -23.0500, lng: 29.9000, severity: "critical", label: "KIDNAPPING", district: "Louis Trichardt", time: "18:49" },
-  { id: 7, lat: -23.9333, lng: 31.1333, severity: "medium",   label: "VEHICLE THEFT", district: "Phalaborwa", time: "18:35" },
+  { id: 1, lat: -29.3167, lng: 27.4833, severity: "critical", label: "ARMED ROBBERY", district: "Maseru CBD", time: "18:46" },
+  { id: 2, lat: -28.8833, lng: 28.0500, severity: "critical", label: "SHOOTING", district: "Leribe", time: "18:44" },
+  { id: 3, lat: -29.8167, lng: 27.2500, severity: "medium",   label: "HIJACKING", district: "Mafeteng", time: "18:39" },
+  { id: 4, lat: -30.1500, lng: 27.4667, severity: "low",      label: "CIVIL UNREST", district: "Mohale's Hoek", time: "18:31" },
+  { id: 5, lat: -28.7667, lng: 28.2500, severity: "medium",   label: "ASSAULT", district: "Butha-Buthe", time: "18:38" },
+  { id: 6, lat: -29.5167, lng: 28.6000, severity: "critical", label: "KIDNAPPING", district: "Thaba-Tseka", time: "18:49" },
+  { id: 7, lat: -29.2833, lng: 29.0667, severity: "medium",   label: "VEHICLE THEFT", district: "Mokhotlong", time: "18:35" },
 ];
 
 const officers = [
-  { id: "LIM-247", lat: -23.880, lng: 29.450, status: "Enroute" },
-  { id: "LIM-108", lat: -23.920, lng: 30.160, status: "At Scene" },
-  { id: "LIM-552", lat: -22.940, lng: 30.480, status: "Standby" },
-  { id: "LIM-891", lat: -24.190, lng: 28.970, status: "At Scene" },
-  { id: "LIM-334", lat: -23.060, lng: 29.890, status: "Enroute" },
-  { id: "LIM-019", lat: -23.940, lng: 31.130, status: "Standby" },
+  { id: "LMP-247", lat: -29.300, lng: 27.490, status: "Enroute" },
+  { id: "LMP-108", lat: -28.880, lng: 28.060, status: "At Scene" },
+  { id: "LMP-552", lat: -29.820, lng: 27.260, status: "Standby" },
+  { id: "LMP-891", lat: -28.770, lng: 28.250, status: "At Scene" },
+  { id: "LMP-334", lat: -29.510, lng: 28.610, status: "Enroute" },
+  { id: "LMP-019", lat: -29.280, lng: 29.070, status: "Standby" },
 ];
 
 const citizens = [
-  { id: "CIT-001", lat: -23.895, lng: 29.471, status: "SOS Active" },
-  { id: "CIT-002", lat: -23.840, lng: 30.172, status: "Monitoring" },
+  { id: "CIT-001", lat: -29.310, lng: 27.495, status: "SOS Active" },
+  { id: "CIT-002", lat: -28.870, lng: 28.070, status: "Monitoring" },
 ];
 
 const riskZones = [
-  { lat: -23.9045, lng: 29.4679, label: "HIGH ROBBERY RISK\n18:00–21:00", radius: 5000, level: "critical" },
-  { lat: -23.8333, lng: 30.1667, label: "GANG ACTIVITY", radius: 3500, level: "high" },
-  { lat: -22.9500, lng: 30.4833, label: "BORDER RISK ZONE", radius: 4000, level: "medium" },
+  { lat: -29.3167, lng: 27.4833, label: "HIGH ROBBERY RISK\n18:00–21:00", radius: 4000, level: "critical" },
+  { lat: -28.8833, lng: 28.0500, label: "GANG ACTIVITY", radius: 3000, level: "high" },
+  { lat: -29.8167, lng: 27.2500, label: "BORDER RISK ZONE", radius: 3500, level: "medium" },
 ];
 
 const sevColor: Record<string, string> = {
@@ -56,7 +56,7 @@ interface Props {
   onTabChange?: (tab: MapTab) => void;
 }
 
-export default function LimpopoMap({ trafficNodes = [], cameras = [], pursuit = null, activeMapTab, onTabChange }: Props) {
+export default function LesothoMap({ trafficNodes = [], cameras = [], pursuit = null, activeMapTab, onTabChange }: Props) {
   const mapRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [internalTab, setInternalTab] = useState<MapTab>("standard");
@@ -92,7 +92,7 @@ export default function LimpopoMap({ trafficNodes = [], cameras = [], pursuit = 
       });
 
       const map = L.map(containerRef.current, {
-        center: LIMPOPO_CENTER,
+        center: LESOTHO_CENTER,
         zoom: 8,
         zoomControl: false,
         attributionControl: false,
@@ -220,21 +220,17 @@ export default function LimpopoMap({ trafficNodes = [], cameras = [], pursuit = 
 
     // Pursuit mode tab
     if (activeTab === "pursuit" && pursuit) {
-      // Suspect route: dashed red line from incident to interception
       const incidentPos = incidents[0];
       const interceptPos = [pursuit.interceptionLat, pursuit.interceptionLng];
 
-      // Suspect path (dashed red)
       add(L.polyline([[incidentPos.lat, incidentPos.lng], interceptPos], {
         color: "#ef4444", weight: 3, dashArray: "8 6", opacity: 0.85,
       }));
 
-      // Police corridor (green)
-      add(L.polyline([[-23.880, 29.450], interceptPos], {
+      add(L.polyline([[-29.300, 27.490], interceptPos], {
         color: "#10b981", weight: 4, dashArray: "12 4", opacity: 0.85,
       }));
 
-      // Interception zone
       add(L.circle(interceptPos, {
         radius: 2000, color: "#eab308", fillColor: "#eab308", fillOpacity: 0.15, weight: 2, dashArray: "6 4",
       }).bindPopup(`
@@ -243,7 +239,6 @@ export default function LimpopoMap({ trafficNodes = [], cameras = [], pursuit = 
         </div>
       `));
 
-      // Suspect marker
       const suspectIcon = L.divIcon({
         html: `<div style="width:18px;height:18px;border-radius:50%;background:#ef4444;border:2px solid #fff;box-shadow:0 0 12px #ef4444;display:flex;align-items:center;justify-content:center;font-size:9px;">🚗</div>`,
         iconSize: [18, 18], className: "",
@@ -251,7 +246,6 @@ export default function LimpopoMap({ trafficNodes = [], cameras = [], pursuit = 
       add(L.marker([incidentPos.lat + 0.02, incidentPos.lng + 0.01], { icon: suspectIcon })
         .bindPopup(`<div style="font-family:sans-serif;font-size:11px;color:#ef4444;font-weight:700">🚗 SUSPECT: ${pursuit.suspectVehicle}</div>`));
 
-      // Camera markers along route
       cameras.filter(c => c.tracking).forEach(cam => {
         const camIcon = L.divIcon({
           html: `<div style="width:14px;height:11px;border-radius:2px;background:#3b82f6;border:2px solid #fff;box-shadow:0 0 10px #3b82f6;"></div>`,
@@ -313,7 +307,7 @@ export default function LimpopoMap({ trafficNodes = [], cameras = [], pursuit = 
       {/* Legend */}
       <div className="absolute top-4 left-4 glass rounded-lg p-2.5 z-20 space-y-1.5">
         <div className="flex items-center gap-2 text-[9px] font-bold text-muted-foreground uppercase tracking-wider">
-          <Shield size={10} className="text-primary"/> LIMPOPO
+          <Shield size={10} className="text-primary"/> LESOTHO
         </div>
         {activeTab === "traffic" ? (
           <>

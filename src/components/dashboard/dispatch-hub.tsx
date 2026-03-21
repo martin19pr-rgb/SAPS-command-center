@@ -16,8 +16,8 @@ interface QueuedIncident {
 }
 
 const queue: QueuedIncident[] = [
-  { id: "#4412", type: "Armed Robbery", priority: "HIGH", location: "Bree St, JHB" },
-  { id: "#4413", type: "Vehicle Theft", priority: "MEDIUM", location: "Sandton City" },
+  { id: "#4412", type: "Armed Robbery", priority: "HIGH", location: "Kingsway, Maseru" },
+  { id: "#4413", type: "Vehicle Theft", priority: "MEDIUM", location: "Leribe Market" },
 ];
 
 const dispatchSteps = [

@@ -14,12 +14,12 @@ interface CommandResult {
 }
 
 const suggestions = [
-  { text: "Green corridor to Polokwane CBD", icon: TrafficCone, type: "TRAFFIC" as CommandType },
+  { text: "Green corridor to Maseru CBD", icon: TrafficCone, type: "TRAFFIC" as CommandType },
   { text: "Show cameras near incident", icon: Camera, type: "CAMERA" as CommandType },
   { text: "Activate pursuit mode", icon: Crosshair, type: "PURSUIT" as CommandType },
   { text: "Escalate to EMS", icon: Radio, type: "DISPATCH" as CommandType },
-  { text: "Block Church St intersection", icon: TrafficCone, type: "TRAFFIC" as CommandType },
-  { text: "Track suspect north on N1", icon: Camera, type: "CAMERA" as CommandType },
+  { text: "Block Kingsway intersection", icon: TrafficCone, type: "TRAFFIC" as CommandType },
+  { text: "Track suspect north on A1", icon: Camera, type: "CAMERA" as CommandType },
 ];
 
 function parseSmartCommand(text: string): CommandResult {
@@ -28,13 +28,13 @@ function parseSmartCommand(text: string): CommandResult {
   if (lower.includes("pursuit") || lower.includes("chase") || lower.includes("suspect vehicle")) {
     return {
       type: "PURSUIT",
-      response: "Pursuit mode activated. AI tracking all cameras. Green corridor N1 northbound. Blocking east exits.",
+      response: "Pursuit mode activated. AI tracking all cameras. Green corridor A1 northbound. Blocking east exits.",
       action: "PURSUIT_MODE",
     };
   }
 
   if (lower.includes("green corridor") || lower.includes("open route") || lower.includes("clear path")) {
-    const route = lower.includes("n1") ? "N1 Northbound" : lower.includes("r71") ? "R71 East" : "Police Route";
+    const route = lower.includes("a1") ? "A1 Northbound" : lower.includes("a2") ? "A2 South" : "Police Route";
     return {
       type: "TRAFFIC",
       response: `Green corridor activated on ${route}. 4 intersections set to priority green. Estimated clear time: 2 min.`,
@@ -45,7 +45,7 @@ function parseSmartCommand(text: string): CommandResult {
   if (lower.includes("hold red") || lower.includes("held red") || lower.includes("stop traffic")) {
     return {
       type: "TRAFFIC",
-      response: "Intersections held red for 120 seconds. Church St, Schoeman St — all exits locked. Suspect routes blocked.",
+      response: "Intersections held red for 120 seconds. Kingsway, Moshoeshoe Rd — all exits locked. Suspect routes blocked.",
       action: "HOLD_RED",
     };
   }
@@ -59,7 +59,7 @@ function parseSmartCommand(text: string): CommandResult {
   }
 
   if (lower.includes("camera") || lower.includes("cctv") || lower.includes("feed") || lower.includes("footage")) {
-    const loc = lower.includes("polokwane") ? "Polokwane CBD" : lower.includes("n1") ? "N1 Corridor" : "incident radius";
+    const loc = lower.includes("maseru") ? "Maseru CBD" : lower.includes("a1") ? "A1 Corridor" : "incident radius";
     return {
       type: "CAMERA",
       response: `Fetching cameras near ${loc}. CAM-101, CAM-102, CAM-103 now live. AI scanning for suspects.`,
@@ -70,7 +70,7 @@ function parseSmartCommand(text: string): CommandResult {
   if (lower.includes("track") && (lower.includes("suspect") || lower.includes("north") || lower.includes("south"))) {
     return {
       type: "CAMERA",
-      response: "AI tracking activated on CAM-101 → CAM-102. Suspect: male, red jacket, northbound. Next camera: CAM-102 (N1 Overpass).",
+      response: "AI tracking activated on CAM-101 → CAM-102. Suspect: male, red jacket, northbound. Next camera: CAM-102 (A1 Checkpoint).",
       action: "TRACK_SUSPECT",
     };
   }
@@ -78,7 +78,7 @@ function parseSmartCommand(text: string): CommandResult {
   if (lower.includes("dispatch") || lower.includes("nearest unit") || lower.includes("send unit")) {
     return {
       type: "DISPATCH",
-      response: "Dispatching LIM-247 — 1.4km from incident. ETA 3.1 min. Officer notified via radio.",
+      response: "Dispatching LMP-247 — 1.4km from incident. ETA 3.1 min. Officer notified via radio.",
       action: "DISPATCH",
     };
   }
@@ -86,7 +86,7 @@ function parseSmartCommand(text: string): CommandResult {
   if (lower.includes("escalate") || lower.includes("ems") || lower.includes("medical") || lower.includes("ambulance")) {
     return {
       type: "DISPATCH",
-      response: "EMS Limpopo notified. 7 units available. Code red dispatch to Polokwane CBD. ETA ~6 minutes.",
+      response: "EMS Lesotho notified. 7 units available. Code red dispatch to Maseru CBD. ETA ~6 minutes.",
       action: "ESCALATE_EMS",
     };
   }
@@ -94,15 +94,15 @@ function parseSmartCommand(text: string): CommandResult {
   if (lower.includes("risk zone") || lower.includes("high risk") || lower.includes("danger")) {
     return {
       type: "INFO",
-      response: "Displaying 3 active risk zones: Polokwane CBD (critical), Tzaneen (high), Thohoyandou (medium). Heat analysis updated.",
+      response: "Displaying 3 active risk zones: Maseru CBD (critical), Leribe (high), Mafeteng (medium). Heat analysis updated.",
     };
   }
 
   if (lower.includes("officer") || lower.includes("locate") || lower.includes("track officer")) {
-    const offId = (text.match(/\b(LIM-?\d+|\d{3})\b/i) || ["LIM-247"])[0];
+    const offId = (text.match(/\b(LMP-?\d+|\d{3})\b/i) || ["LMP-247"])[0];
     return {
       type: "INFO",
-      response: `Officer ${offId} located: -23.880° / 29.450°. Status: Enroute. BPM: 112. Battery: 84%. ETA to scene: 2.1 min.`,
+      response: `Officer ${offId} located: -29.300° / 27.490°. Status: Enroute. BPM: 112. Battery: 84%. ETA to scene: 2.1 min.`,
     };
   }
 
@@ -116,7 +116,7 @@ function parseSmartCommand(text: string): CommandResult {
 
   return {
     type: "GENERAL",
-    response: `Command processed: "${text}". SAPS AI brain is analysing and routing to the appropriate system.`,
+    response: `Command processed: "${text}". LMPS AI brain is analysing and routing to the appropriate system.`,
   };
 }
 
@@ -199,7 +199,7 @@ export default function CommandBar({ onCommand }: Props) {
           type="text"
           value={command}
           onChange={e => setCommand(e.target.value)}
-          placeholder="'Green corridor to CBD' · 'Activate pursuit' · 'Block Church St' · 'Show cameras near incident'…"
+          placeholder="'Green corridor to CBD' · 'Activate pursuit' · 'Block Kingsway' · 'Show cameras near incident'…"
           className="flex-1 bg-transparent border-none outline-none py-3 text-sm font-medium placeholder:text-muted-foreground/40"
           disabled={feedback === "processing"}
         />

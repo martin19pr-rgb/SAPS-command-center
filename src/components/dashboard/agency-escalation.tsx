@@ -20,12 +20,12 @@ interface Agency {
 
 const agencies: Agency[] = [
   {
-    key: "ems", name: "EMS LIMPOPO", sub: "Emergency Medical Services", icon: Siren, units: 7, phone: "10177",
+    key: "ems", name: "EMS LESOTHO", sub: "Emergency Medical Services", icon: Siren, units: 7, phone: "121",
     color: "bg-red-500/12 text-red-400 border-red-500/22",
     activeColor: "bg-red-500/22 text-red-300 border-red-400/45 shadow-red-500/15",
   },
   {
-    key: "traffic", name: "TRAFFIC DEPT", sub: "Limpopo Traffic Police", icon: Truck, units: 12, phone: "0800 006 417",
+    key: "traffic", name: "TRAFFIC DEPT", sub: "Lesotho Traffic Police", icon: Truck, units: 12, phone: "22312067",
     color: "bg-blue-500/12 text-blue-400 border-blue-500/22",
     activeColor: "bg-blue-500/22 text-blue-300 border-blue-400/45 shadow-blue-500/15",
   },

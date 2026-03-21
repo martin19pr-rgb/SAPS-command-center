@@ -20,14 +20,14 @@ interface Incident {
 }
 
 const allIncidents: Incident[] = [
-  { id: "#LIM-4451", type: "Armed Robbery", location: "Polokwane CBD, Polokwane", district: "Polokwane", officer: "LIM-247", time: "18:46", status: "Active", severity: "critical", description: "3 armed suspects, blue Toyota Hilux" },
-  { id: "#LIM-4450", type: "Shooting", location: "Tzaneen Hospital Road", district: "Tzaneen", officer: "LIM-108", time: "18:44", status: "Enroute", severity: "critical", description: "1 victim, suspects fled on foot" },
-  { id: "#LIM-4449", type: "Kidnapping", location: "Louis Trichardt N1", district: "Louis Trichardt", officer: "LIM-334", time: "18:41", status: "Escalated", severity: "critical", description: "AMBER alert issued, white VW Golf" },
-  { id: "#LIM-4448", type: "Vehicle Hijacking", location: "Phalaborwa Gate Road", district: "Phalaborwa", officer: "LIM-019", time: "18:39", status: "Enroute", severity: "medium", description: "Blue BMW 3-series, 2 suspects" },
-  { id: "#LIM-4447", type: "Assault", location: "Mokopane Mankweng", district: "Mokopane", officer: "LIM-891", time: "18:35", status: "Active", severity: "medium", description: "Domestic violence, suspect on scene" },
-  { id: "#LIM-4446", type: "Civil Unrest", location: "Giyani Main Road", district: "Giyani", officer: "LIM-552", time: "18:31", status: "Active", severity: "low", description: "Community protest, roads blocked" },
-  { id: "#LIM-4445", type: "Vehicle Theft", location: "Thohoyandou Market", district: "Thohoyandou", officer: "LIM-247", time: "18:20", status: "Resolved", severity: "medium", description: "Vehicle recovered, 1 arrested" },
-  { id: "#LIM-4444", type: "House Break-in", location: "Bela-Bela Ext 5", district: "Bela-Bela", officer: "LIM-108", time: "17:55", status: "Resolved", severity: "low", description: "Suspects fled, scene secured" },
+  { id: "#LMP-4451", type: "Armed Robbery", location: "Maseru CBD, Kingsway", district: "Maseru", officer: "LMP-247", time: "18:46", status: "Active", severity: "critical", description: "3 armed suspects, blue Toyota Hilux" },
+  { id: "#LMP-4450", type: "Shooting", location: "Leribe Hospital Road", district: "Leribe", officer: "LMP-108", time: "18:44", status: "Enroute", severity: "critical", description: "1 victim, suspects fled on foot" },
+  { id: "#LMP-4449", type: "Kidnapping", location: "Thaba-Tseka A3", district: "Thaba-Tseka", officer: "LMP-334", time: "18:41", status: "Escalated", severity: "critical", description: "AMBER alert issued, white VW Golf" },
+  { id: "#LMP-4448", type: "Vehicle Hijacking", location: "Mokhotlong Main Road", district: "Mokhotlong", officer: "LMP-019", time: "18:39", status: "Enroute", severity: "medium", description: "Blue BMW 3-series, 2 suspects" },
+  { id: "#LMP-4447", type: "Assault", location: "Butha-Buthe Market", district: "Butha-Buthe", officer: "LMP-891", time: "18:35", status: "Active", severity: "medium", description: "Domestic violence, suspect on scene" },
+  { id: "#LMP-4446", type: "Civil Unrest", location: "Mohale's Hoek Main Road", district: "Mohale's Hoek", officer: "LMP-552", time: "18:31", status: "Active", severity: "low", description: "Community protest, roads blocked" },
+  { id: "#LMP-4445", type: "Vehicle Theft", location: "Mafeteng Market Square", district: "Mafeteng", officer: "LMP-247", time: "18:20", status: "Resolved", severity: "medium", description: "Vehicle recovered, 1 arrested" },
+  { id: "#LMP-4444", type: "House Break-in", location: "Qacha's Nek Ext 2", district: "Qacha's Nek", officer: "LMP-108", time: "17:55", status: "Resolved", severity: "low", description: "Suspects fled, scene secured" },
 ];
 
 const statusColor: Record<IncidentStatus, string> = {
@@ -58,7 +58,7 @@ export default function ActivityPage() {
   );
 
   return (
-    <DashboardShell pageTitle="OPERATIONAL ACTIVITY" pageSubtitle="Limpopo Province — Live Incident Log">
+    <DashboardShell pageTitle="OPERATIONAL ACTIVITY" pageSubtitle="Kingdom of Lesotho — Live Incident Log">
       <div className="flex-1 p-5 flex gap-5 overflow-hidden">
         {/* Incident List */}
         <div className="flex-1 flex flex-col gap-4 min-w-0">

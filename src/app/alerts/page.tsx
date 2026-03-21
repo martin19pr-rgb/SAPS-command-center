@@ -22,14 +22,14 @@ interface AlertEntry {
 }
 
 const initialAlerts: AlertEntry[] = [
-  { id: 1, severity: "CRITICAL", type: "PANIC", message: "PANIC ALERT — Officer LIM-891", detail: "Officer heartrate 149bpm, device stationary. Last GPS: Louis Trichardt.", location: "Louis Trichardt", time: "18:49", officer: "LIM-891", read: false },
-  { id: 2, severity: "CRITICAL", type: "SHOOTING", message: "ACTIVE SHOOTING — Tzaneen", detail: "Multiple gunshots reported. EMS requested. LIM-108 dispatched.", location: "Tzaneen Hospital Road", time: "18:44", officer: "LIM-108", read: false, emsLinked: true },
-  { id: 3, severity: "CRITICAL", type: "ROBBERY", message: "ARMED ROBBERY — Polokwane CBD", detail: "3 armed suspects. Blue Toyota Hilux. SAPS tactical unit notified.", location: "Polokwane CBD", time: "18:46", officer: "LIM-247", read: false },
-  { id: 4, severity: "HIGH", type: "HIJACKING", message: "VEHICLE HIJACKING — Phalaborwa", detail: "Blue BMW 3-series hijacked. ANPR cameras activated on N1.", location: "Phalaborwa Gate Road", time: "18:39", officer: "LIM-019", read: false },
-  { id: 5, severity: "HIGH", type: "EMS_REQUEST", message: "EMS REQUEST — Giyani", detail: "3 injured in unrest. EMS dispatched from Giyani District Hospital.", location: "Giyani Main Road", time: "18:35", read: false, emsLinked: true },
-  { id: 6, severity: "MEDIUM", type: "SIGNAL_LOST", message: "SIGNAL LOST — Officer LIM-334", detail: "GPS and radio signal lost. Last known: N1 near Louis Trichardt.", location: "N1 Louis Trichardt", time: "18:30", officer: "LIM-334", read: true },
-  { id: 7, severity: "MEDIUM", type: "DISPATCH", message: "AUTO-DISPATCH — Armed Robbery #LIM-4451", detail: "LIM-247 automatically assigned. ETA 3.1 min. Override available.", location: "Polokwane CBD", time: "18:46", officer: "LIM-247", read: true },
-  { id: 8, severity: "INFO", type: "SYSTEM", message: "AI Predictive Alert — Evening Crime Peak", detail: "Historical data shows 40% increase in crime between 18:00–21:00. Additional patrols recommended for Polokwane CBD.", location: "Polokwane", time: "18:00", read: true },
+  { id: 1, severity: "CRITICAL", type: "PANIC", message: "PANIC ALERT — Officer LMP-891", detail: "Officer heartrate 149bpm, device stationary. Last GPS: Thaba-Tseka.", location: "Thaba-Tseka", time: "18:49", officer: "LMP-891", read: false },
+  { id: 2, severity: "CRITICAL", type: "SHOOTING", message: "ACTIVE SHOOTING — Leribe", detail: "Multiple gunshots reported. EMS requested. LMP-108 dispatched.", location: "Leribe Hospital Road", time: "18:44", officer: "LMP-108", read: false, emsLinked: true },
+  { id: 3, severity: "CRITICAL", type: "ROBBERY", message: "ARMED ROBBERY — Maseru CBD", detail: "3 armed suspects. Blue Toyota Hilux. LMPS tactical unit notified.", location: "Maseru CBD", time: "18:46", officer: "LMP-247", read: false },
+  { id: 4, severity: "HIGH", type: "HIJACKING", message: "VEHICLE HIJACKING — Mokhotlong", detail: "Blue BMW 3-series hijacked. ANPR cameras activated on A3.", location: "Mokhotlong Main Road", time: "18:39", officer: "LMP-019", read: false },
+  { id: 5, severity: "HIGH", type: "EMS_REQUEST", message: "EMS REQUEST — Mohale's Hoek", detail: "3 injured in unrest. EMS dispatched from Mohale's Hoek District Hospital.", location: "Mohale's Hoek Main Road", time: "18:35", read: false, emsLinked: true },
+  { id: 6, severity: "MEDIUM", type: "SIGNAL_LOST", message: "SIGNAL LOST — Officer LMP-334", detail: "GPS and radio signal lost. Last known: A1 near Butha-Buthe.", location: "A1 Butha-Buthe", time: "18:30", officer: "LMP-334", read: true },
+  { id: 7, severity: "MEDIUM", type: "DISPATCH", message: "AUTO-DISPATCH — Armed Robbery #LMP-4451", detail: "LMP-247 automatically assigned. ETA 3.1 min. Override available.", location: "Maseru CBD", time: "18:46", officer: "LMP-247", read: true },
+  { id: 8, severity: "INFO", type: "SYSTEM", message: "AI Predictive Alert — Evening Crime Peak", detail: "Historical data shows 40% increase in crime between 18:00–21:00. Additional patrols recommended for Maseru CBD.", location: "Maseru", time: "18:00", read: true },
 ];
 
 const severityStyle: Record<AlertSeverity, string> = {
@@ -82,7 +82,7 @@ export default function AlertsPage() {
   const filtered = filter === "All" ? alerts : alerts.filter(a => a.severity === filter);
 
   return (
-    <DashboardShell pageTitle="ALERT CENTRE" pageSubtitle="Limpopo Province — Real-Time Notifications">
+    <DashboardShell pageTitle="ALERT CENTRE" pageSubtitle="Kingdom of Lesotho — Real-Time Notifications">
       <div className="flex-1 p-5 flex flex-col gap-4 overflow-hidden">
         {/* Top bar */}
         <div className="flex items-center justify-between flex-shrink-0">
