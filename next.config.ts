@@ -1,7 +1,7 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  allowedDevOrigins: ['*.replit.dev', '*.spock.replit.dev', '*.repl.co'],
   typescript: {
     ignoreBuildErrors: true,
   },
